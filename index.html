@@ -252,7 +252,6 @@
     td { height: 46px; padding: 0 15px; border-bottom: 1px solid #edf0ed; }
     tbody tr:last-child td { border-bottom: 0; }
     tbody tr:hover { background: #f7faf7; }
-    .number { width: 66px; color: #8a948e; font: 400 11px var(--mono); }
     .person { font-weight: 600; }
     .class-column { width: 80px; color: var(--muted); font: 500 11px var(--mono); }
     .date-column { width: 120px; color: var(--muted); font: 400 12px var(--mono); white-space: nowrap; }
@@ -366,7 +365,7 @@
         <div class="table-meta"><span id="active-shift">CLASS</span><span id="result-count">0 CADETS</span></div>
         <div class="table-scroll">
           <table>
-            <thead><tr><th class="number">NO.</th><th id="class-heading" class="class-column hidden">CLASS</th><th>NAME</th><th id="date-heading" class="date-column hidden">DATE LEFT</th><th id="payroll-heading" class="payroll hidden">PAYROLL ID</th></tr></thead>
+            <thead><tr><th id="class-heading" class="class-column hidden">CLASS</th><th>NAME</th><th id="date-heading" class="date-column hidden">DATE LEFT</th><th id="payroll-heading" class="payroll hidden">PAYROLL ID</th></tr></thead>
             <tbody id="roster-rows"></tbody>
           </table>
         </div>
@@ -525,19 +524,15 @@
           const row = document.createElement('tr');
           const cell = document.createElement('td');
           cell.className = 'empty-results';
-          cell.colSpan = 2 + (2 * Number(resignedSelected)) + Number(showPayroll);
+          cell.colSpan = 1 + (2 * Number(resignedSelected)) + Number(showPayroll);
           cell.textContent = 'No matching cadets';
           row.append(cell);
           rowsElement.append(row);
           return;
         }
 
-        filtered.forEach((person, index) => {
+        filtered.forEach((person) => {
           const row = document.createElement('tr');
-          const number = document.createElement('td');
-          number.className = 'number';
-          number.textContent = String(index + 1).padStart(2, '0');
-          row.append(number);
           if (resignedSelected) {
             const classCell = document.createElement('td');
             classCell.className = 'class-column';
