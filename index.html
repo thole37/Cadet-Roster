@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6f2">
+  <title>VJTF Cadet Roster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="roster-data.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f5f6f2;
+      --white: #fff;
+      --ink: #202b28;
+      --muted: #68736e;
+      --line: #dce2dc;
+      --green: #176b53;
+      --green-dark: #124c3d;
+      --green-pale: #e3f0e9;
+      --coral: #d96149;
+      --mono: "IBM Plex Mono", Consolas, monospace;
+      --sans: "DM Sans", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 14px;
+    }
+
+    button, input { font: inherit; }
+    button { color: inherit; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 64px;
+      padding: 0 clamp(20px, 5vw, 76px);
+      background: var(--green-dark);
+      color: #f8fbf7;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border: 1px solid #77a68f;
+      border-radius: 5px;
+      color: #c5e4d0;
+      font: 500 12px var(--mono);
+    }
+
+    .local-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #d0e0d8;
+      font: 400 11px var(--mono);
+      letter-spacing: .02em;
+    }
+
+    .local-dot { width: 7px; height: 7px; border-radius: 50%; background: #9bd1a9; }
+
+    main {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 43px 0 72px;
+    }
+
+    .page-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      padding-bottom: 27px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--green);
+      font: 500 11px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 31px;
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.12;
+    }
+
+    .source-name {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 14px;
+      border: 1px solid var(--green);
+      border-radius: 4px;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background .16s ease, transform .16s ease;
+    }
+
+    .button:hover { transform: translateY(-1px); background: var(--green-dark); }
+    .button:focus-visible, .shift-tab:focus-visible, input:focus-visible { outline: 3px solid #e8a15f; outline-offset: 2px; }
+    .button svg { width: 16px; height: 16px; }
+    .file-input { display: none; }
+
+    .overview {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin: 25px 0 32px;
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .stat { min-height: 93px; padding: 17px 21px; }
+    .stat + .stat { border-left: 1px solid var(--line); }
+    .stat-label { color: var(--muted); font-size: 12px; }
+    .stat-value { margin-top: 6px; font-size: 25px; font-weight: 600; line-height: 1; }
+    .stat-value small { margin-left: 5px; color: var(--muted); font-size: 12px; font-weight: 500; }
+
+    .class-status { margin: 0 0 31px; }
+    .status-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+    .status-heading h2 { margin: 0; font-size: 16px; font-weight: 600; }
+    .status-heading p { margin: 0; color: var(--muted); font-size: 12px; }
+    .status-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+    .status-card {
+      --class-color: var(--green);
+      display: flex;
+      min-width: 0;
+      min-height: 112px;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--white);
+      text-align: left;
+      cursor: pointer;
+    }
+    .status-card[data-class="G"], .status-card[data-class="I"] { --class-color: #79827d; }
+    .status-card[data-class="H"] { --class-color: #347ba7; }
+    .status-card[data-class="J"] { --class-color: #f2b24c; }
+    .status-card:hover { border-color: #a7c9b4; }
+    .status-card[aria-pressed="true"] { border-color: var(--class-color); box-shadow: inset 0 0 0 1px var(--class-color); }
+    .status-card:focus-visible { outline: 3px solid #e8a15f; outline-offset: 2px; }
+    .status-pie { width: 76px; aspect-ratio: 1; flex: 0 0 auto; border-radius: 50%; background: conic-gradient(var(--class-color) 0 var(--active-share), var(--coral) var(--active-share) 100%); }
+    .status-details { display: grid; min-width: 0; gap: 5px; }
+    .status-class { color: var(--class-color); font: 500 11px var(--mono); }
+    .status-started { color: var(--muted); font-size: 11px; }
+    .status-started strong { margin-left: 3px; color: var(--ink); font-size: 13px; }
+    .status-legend { display: grid; gap: 3px; color: var(--muted); font-size: 10px; }
+    .status-legend span { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+    .status-legend strong { color: var(--ink); font-weight: 600; }
+    .legend-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; }
+    .legend-current { background: var(--class-color); }
+    .legend-left { background: var(--coral); }
+
+    .roster-section { animation: appear .35s ease both; }
+    .roster-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 17px;
+    }
+
+    .shift-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+    .shift-tab {
+      min-width: 46px;
+      height: 36px;
+      padding: 0 12px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font: 500 12px var(--mono);
+    }
+
+    .shift-tab:hover { background: #e9eee9; color: var(--ink); }
+    .shift-tab[aria-selected="true"] { border-color: #b9d6c6; background: var(--green-pale); color: var(--green-dark); }
+
+    .roster-tools { display: flex; align-items: center; gap: 18px; }
+    .search-wrap { position: relative; }
+    .search-wrap svg { position: absolute; top: 10px; left: 11px; width: 16px; height: 16px; color: #7a8580; pointer-events: none; }
+
+    .search {
+      width: 230px;
+      height: 37px;
+      padding: 0 12px 0 35px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--white);
+      color: var(--ink);
+    }
+
+    .search::placeholder { color: #8a948e; }
+    .toggle { display: flex; align-items: center; gap: 8px; color: var(--muted); white-space: nowrap; font-size: 12px; cursor: pointer; }
+    .toggle input { width: 15px; height: 15px; margin: 0; accent-color: var(--green); }
+
+    .table-meta {
+      display: flex;
+      justify-content: space-between;
+      padding: 11px 14px;
+      border: 1px solid var(--line);
+      border-bottom: 0;
+      background: #eef1ec;
+      color: var(--muted);
+      font: 400 11px var(--mono);
+    }
+
+    .table-scroll { overflow-x: auto; border: 1px solid var(--line); background: var(--white); }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { height: 39px; padding: 0 15px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; font-weight: 600; }
+    td { height: 46px; padding: 0 15px; border-bottom: 1px solid #edf0ed; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: #f7faf7; }
+    .number { width: 66px; color: #8a948e; font: 400 11px var(--mono); }
+    .person { font-weight: 600; }
+    .class-column { width: 80px; color: var(--muted); font: 500 11px var(--mono); }
+    .date-column { width: 120px; color: var(--muted); font: 400 12px var(--mono); white-space: nowrap; }
+    .payroll { width: 190px; color: #55635d; font: 400 12px var(--mono); }
+    .empty-results { padding: 36px 16px; color: var(--muted); text-align: center; }
+    .message { margin: 12px 0 0; color: #a43f31; font-size: 13px; }
+
+    .welcome {
+      display: grid;
+      min-height: 300px;
+      place-items: center;
+      margin-top: 29px;
+      border: 1px dashed #b9c6bc;
+      background: rgba(255,255,255,.54);
+      text-align: center;
+      animation: appear .35s ease both;
+    }
+
+    .welcome-inner { width: min(440px, calc(100% - 36px)); padding: 35px 0; }
+    .welcome-icon { display: grid; width: 48px; height: 48px; margin: 0 auto 18px; place-items: center; border-radius: 50%; background: var(--green-pale); color: var(--green); }
+    .welcome-icon svg { width: 22px; height: 22px; }
+    .welcome h2 { margin: 0; font-size: 19px; font-weight: 600; }
+    .welcome p { margin: 9px 0 20px; color: var(--muted); line-height: 1.6; }
+    .privacy-note { margin-top: 14px !important; font: 400 11px var(--mono); }
+    .hidden { display: none !important; }
+
+    @keyframes appear { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 700px) {
+      .topbar { min-height: 58px; padding: 0 18px; }
+      main { width: calc(100% - 36px); padding-top: 30px; }
+      .page-heading { align-items: flex-start; }
+      .page-heading .button { min-height: 36px; padding: 0 10px; font-size: 12px; }
+      h1 { font-size: 27px; }
+      .overview { margin: 20px 0 26px; }
+      .status-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat { min-height: 81px; padding: 13px 11px; }
+      .stat-label { font-size: 10px; }
+      .stat-value { font-size: 22px; }
+      .roster-toolbar { align-items: stretch; flex-direction: column; gap: 12px; }
+      .roster-tools { justify-content: space-between; gap: 10px; }
+      .search-wrap { flex: 1; }
+      .search { width: 100%; }
+      .table-scroll { margin-right: -1px; }
+      .payroll { width: 120px; }
+    }
+
+    @media (max-width: 420px) {
+      .local-label { font-size: 0; }
+      .local-dot { width: 8px; height: 8px; }
+      .page-heading { gap: 8px; }
+      .page-heading .button { gap: 5px; }
+      .overview { grid-template-columns: repeat(3, 1fr); }
+      .status-card { gap: 8px; padding: 9px 7px; }
+      .status-pie { width: 58px; }
+      .status-details { gap: 4px; }
+      .status-legend { font-size: 9px; }
+      .stat { padding: 12px 8px; }
+      .stat-label { min-height: 25px; line-height: 1.2; }
+      .stat-value { font-size: 20px; }
+      .toggle { font-size: 11px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">VJ</span><span>VJTF Cadet Roster</span></div>
+    <div class="local-label"><span class="local-dot" aria-hidden="true"></span>LOCAL WORKBOOK</div>
+  </header>
+
+  <main>
+    <section class="page-heading" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Personnel / Class assignments</p>
+        <h1 id="page-title">Roster</h1>
+        <p class="source-name">2026 roster · 5 classes</p>
+      </div>
+    </section>
+
+    <section id="roster-view" aria-label="Roster data">
+      <div class="overview" aria-label="Roster summary">
+        <div class="stat"><div class="stat-label">Cadets in this class</div><div id="shift-total" class="stat-value">0</div></div>
+        <div class="stat"><div class="stat-label">Classes in workbook</div><div id="shift-count" class="stat-value">0</div></div>
+        <div class="stat"><div class="stat-label">Cadets across classes</div><div id="roster-total" class="stat-value">0</div></div>
+      </div>
+
+      <section class="class-status" aria-labelledby="status-title">
+        <div class="status-heading">
+          <h2 id="status-title">Class status</h2>
+          <p>Started, in class, and left</p>
+        </div>
+        <div id="status-grid" class="status-grid" aria-label="Cadet status by class"></div>
+      </section>
+
+      <div class="roster-section">
+        <div class="roster-toolbar">
+          <div id="shift-tabs" class="shift-tabs" role="tablist" aria-label="Select class or resigned cadets"></div>
+          <div class="roster-tools">
+            <label class="search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4 4"/></svg>
+              <input id="search" class="search" type="search" placeholder="Find a cadet" aria-label="Find a cadet">
+            </label>
+            <label class="toggle"><input id="show-payroll" type="checkbox" checked>Payroll IDs</label>
+          </div>
+        </div>
+
+        <div class="table-meta"><span id="active-shift">CLASS</span><span id="result-count">0 CADETS</span></div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th class="number">NO.</th><th id="class-heading" class="class-column hidden">CLASS</th><th>NAME</th><th id="date-heading" class="date-column hidden">DATE LEFT</th><th id="payroll-heading" class="payroll hidden">PAYROLL ID</th></tr></thead>
+            <tbody id="roster-rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const shiftTabs = document.querySelector('#shift-tabs');
+      const rowsElement = document.querySelector('#roster-rows');
+      const searchInput = document.querySelector('#search');
+      const payrollToggle = document.querySelector('#show-payroll');
+      const payrollHeading = document.querySelector('#payroll-heading');
+      const dateHeading = document.querySelector('#date-heading');
+      const statusGrid = document.querySelector('#status-grid');
+      const shifts = window.ROSTER_DATA.map((sheet) => ({
+        name: sheet.name,
+        started: sheet.started,
+        left: sheet.left,
+        people: sheet.cadets
+          .map(([first, last, payroll]) => ({ first, last, payroll }))
+          .sort((cadetA, cadetB) => cadetA.last.localeCompare(cadetB.last, undefined, { sensitivity: 'base' }) || cadetA.first.localeCompare(cadetB.first, undefined, { sensitivity: 'base' }))
+      }));
+      const dateSortValue = (value) => {
+        if (!value) return 0;
+        const [month, day, year] = value.split('/').map(Number);
+        if (!month || !day || !year) return 0;
+        return Date.UTC(year < 100 ? year + 2000 : year, month - 1, day);
+      };
+      const resignedCadets = window.RESIGNED_DATA
+        .map(([className, first, last, payroll]) => ({ className, first, last, payroll, date: window.RESIGNED_DATES[payroll] || '' }))
+        .sort((cadetA, cadetB) => dateSortValue(cadetB.date) - dateSortValue(cadetA.date) || cadetA.last.localeCompare(cadetB.last, undefined, { sensitivity: 'base' }) || cadetA.first.localeCompare(cadetB.first, undefined, { sensitivity: 'base' }));
+      let selectedShift = 0;
+      let resignedSelected = false;
+
+      function renderStatus() {
+        statusGrid.replaceChildren();
+        shifts.forEach((shift, index) => {
+          const active = shift.people.length;
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'status-card';
+          button.dataset.class = shift.name.replace(/^\d{4}\s*/, '');
+          button.setAttribute('aria-pressed', String(!resignedSelected && index === selectedShift));
+          button.setAttribute('aria-label', `${shift.name}: ${shift.started} started, ${active} in class, ${shift.left} left class. Show roster.`);
+          button.style.setProperty('--active-share', `${(active / shift.started) * 100}%`);
+
+          const pie = document.createElement('span');
+          pie.className = 'status-pie';
+          pie.setAttribute('aria-hidden', 'true');
+
+          const details = document.createElement('span');
+          details.className = 'status-details';
+          const className = document.createElement('span');
+          className.className = 'status-class';
+          className.textContent = shift.name.replace(/^\d{4}\s*/, 'CLASS ');
+          const started = document.createElement('span');
+          started.className = 'status-started';
+          started.append('Started ');
+          const startedCount = document.createElement('strong');
+          startedCount.textContent = shift.started;
+          started.append(startedCount);
+
+          const legend = document.createElement('span');
+          legend.className = 'status-legend';
+          for (const [label, count, colorClass] of [['In class', active, 'legend-current'], ['Left class', shift.left, 'legend-left']]) {
+            const item = document.createElement('span');
+            const dot = document.createElement('span');
+            dot.className = `legend-dot ${colorClass}`;
+            dot.setAttribute('aria-hidden', 'true');
+            const text = document.createElement('span');
+            text.append(`${label} `);
+            const value = document.createElement('strong');
+            value.textContent = count;
+            text.append(value);
+            item.append(dot, text);
+            legend.append(item);
+          }
+
+          details.append(className, started, legend);
+          button.append(pie, details);
+          button.addEventListener('click', () => {
+            resignedSelected = false;
+            selectedShift = index;
+            renderTabs();
+            renderStatus();
+            renderPeople();
+          });
+          statusGrid.append(button);
+        });
+      }
+
+      function renderTabs() {
+        shiftTabs.replaceChildren();
+        shifts.forEach((shift, index) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'shift-tab';
+          button.id = `shift-tab-${index}`;
+          button.setAttribute('role', 'tab');
+          button.setAttribute('aria-selected', String(!resignedSelected && index === selectedShift));
+          button.setAttribute('aria-controls', 'roster-rows');
+          button.textContent = shift.name.replace(/^\d{4}\s*/, '');
+          button.addEventListener('click', () => {
+            resignedSelected = false;
+            selectedShift = index;
+            renderTabs();
+            renderStatus();
+            renderPeople();
+          });
+          shiftTabs.append(button);
+        });
+
+        const resignedButton = document.createElement('button');
+        resignedButton.type = 'button';
+        resignedButton.className = 'shift-tab';
+        resignedButton.id = 'shift-tab-resigned';
+        resignedButton.setAttribute('role', 'tab');
+        resignedButton.setAttribute('aria-selected', String(resignedSelected));
+        resignedButton.setAttribute('aria-controls', 'roster-rows');
+        resignedButton.textContent = 'Resigned';
+        resignedButton.addEventListener('click', () => {
+          resignedSelected = true;
+          renderTabs();
+          renderStatus();
+          renderPeople();
+        });
+        shiftTabs.append(resignedButton);
+      }
+
+      function renderPeople() {
+        const shift = shifts[selectedShift];
+        const cadets = resignedSelected ? resignedCadets : shift.people;
+        const query = searchInput.value.trim().toLocaleLowerCase();
+        const showPayroll = payrollToggle.checked;
+        const filtered = cadets.filter((person) => {
+          const displayName = [person.last, person.first].filter(Boolean).join(', ');
+          const searchable = `${person.first} ${person.last} ${displayName} ${person.className || ''}${showPayroll ? ` ${person.payroll}` : ''}`.toLocaleLowerCase();
+          return searchable.includes(query);
+        });
+
+        document.querySelector('.overview .stat-label').textContent = resignedSelected ? 'Resigned cadets' : 'Cadets in this class';
+        document.querySelector('#shift-total').textContent = cadets.length;
+        document.querySelector('#shift-count').textContent = shifts.length;
+        document.querySelector('#roster-total').textContent = shifts.reduce((total, item) => total + item.people.length, 0);
+        document.querySelector('#active-shift').textContent = resignedSelected ? 'RESIGNED' : shift.name.toUpperCase();
+        document.querySelector('#result-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'CADET' : 'CADETS'}`;
+        document.querySelector('#class-heading').classList.toggle('hidden', !resignedSelected);
+        dateHeading.classList.toggle('hidden', !resignedSelected);
+        payrollHeading.classList.toggle('hidden', !showPayroll);
+        rowsElement.replaceChildren();
+
+        if (!filtered.length) {
+          const row = document.createElement('tr');
+          const cell = document.createElement('td');
+          cell.className = 'empty-results';
+          cell.colSpan = 2 + (2 * Number(resignedSelected)) + Number(showPayroll);
+          cell.textContent = 'No matching cadets';
+          row.append(cell);
+          rowsElement.append(row);
+          return;
+        }
+
+        filtered.forEach((person, index) => {
+          const row = document.createElement('tr');
+          const number = document.createElement('td');
+          number.className = 'number';
+          number.textContent = String(index + 1).padStart(2, '0');
+          row.append(number);
+          if (resignedSelected) {
+            const classCell = document.createElement('td');
+            classCell.className = 'class-column';
+            classCell.textContent = person.className.replace(/^\d{4}\s*/, '');
+            row.append(classCell);
+          }
+          const name = document.createElement('td');
+          name.className = 'person';
+          name.textContent = [person.last, person.first].filter(Boolean).join(', ');
+          row.append(name);
+          if (resignedSelected) {
+            const date = document.createElement('td');
+            date.className = 'date-column';
+            date.textContent = person.date;
+            row.append(date);
+          }
+          if (showPayroll) {
+            const payroll = document.createElement('td');
+            payroll.className = 'payroll';
+            payroll.textContent = person.payroll || '—';
+            row.append(payroll);
+          }
+          rowsElement.append(row);
+        });
+      }
+
+      searchInput.addEventListener('input', renderPeople);
+      payrollToggle.addEventListener('change', renderPeople);
+      renderTabs();
+      renderStatus();
+      renderPeople();
+    })();
+  </script>
+</body>
+</html>
