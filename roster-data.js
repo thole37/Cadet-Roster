@@ -94,7 +94,6 @@ window.ROSTER_DATA = [
       ['Pedro', 'Martinez', '185893'],
       ['Eva', 'Merryman', '185916'],
       ['Johnathan', 'Perez', '185921'],
-      ['Martin', 'Sanchez', '185901'],
       ['Steven', 'Shaw', '183095'],
       ['Gabriel', 'Turmero', '185928']
     ]
@@ -251,6 +250,7 @@ window.RESIGNED_DATA = [
   ['2026 I', 'Carlos', 'Perez', '185920'],
   ['2026 I', 'Anthony', 'Sampson', '185923'],
   ['2026 I', 'Jesse', 'Visser', '185917'],
+  ['2026 I', 'Martin', 'Sanchez', '185901'],
   ['2026 J', 'Xavier', 'Jones', '185913'],
   ['2026 J', 'Diego', 'Lopez', '185914'],
   ['2026 J', 'Emanuel', 'Marion', '181415']
