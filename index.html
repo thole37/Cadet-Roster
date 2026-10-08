@@ -181,9 +181,11 @@
     .status-pie { width: 76px; aspect-ratio: 1; flex: 0 0 auto; border-radius: 50%; background: conic-gradient(var(--class-color) 0 var(--active-share), var(--coral) var(--active-share) 100%); }
     .status-details { display: grid; min-width: 0; gap: 5px; }
     .status-class { color: var(--class-color); font: 500 11px var(--mono); }
-    .status-started { color: var(--muted); font-size: 11px; }
-    .status-started strong { margin-left: 3px; color: var(--ink); font-size: 13px; }
+    .status-started { padding-left: 12px; color: var(--muted); font-size: 10px; }
+    .status-started strong { margin-left: 3px; color: var(--ink); font-size: 10px; }
     .status-legend { display: grid; gap: 3px; color: var(--muted); font-size: 10px; }
+    .status-legend > span:first-child { font-size: 11px; }
+    .status-legend > span:first-child strong { font-size: 13px; }
     .status-legend span { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
     .status-legend strong { color: var(--ink); font-weight: 600; }
     .legend-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; }
@@ -431,7 +433,7 @@
 
           const legend = document.createElement('span');
           legend.className = 'status-legend';
-          for (const [label, count, colorClass] of [['In class', active, 'legend-current'], ['Left class', shift.left, 'legend-left']]) {
+          const createStatusItem = (label, count, colorClass) => {
             const item = document.createElement('span');
             const dot = document.createElement('span');
             dot.className = `legend-dot ${colorClass}`;
@@ -442,10 +444,11 @@
             value.textContent = count;
             text.append(value);
             item.append(dot, text);
-            legend.append(item);
-          }
+            return item;
+          };
+          legend.append(createStatusItem('In class', active, 'legend-current'), started, createStatusItem('Left class', shift.left, 'legend-left'));
 
-          details.append(className, started, legend);
+          details.append(className, legend);
           button.append(pie, details);
           button.addEventListener('click', () => {
             resignedSelected = false;
