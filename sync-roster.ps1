@@ -14,7 +14,7 @@ if (-not (Test-Path -LiteralPath $outputPath)) {
   throw "Existing roster-data.js not found: $outputPath"
 }
 
-function Normalize-Text([object]$Value) {
+function ConvertTo-NormalizedText([object]$Value) {
   if ($null -eq $Value) { return '' }
   return ([regex]::Replace([string]$Value, '\s+', ' ')).Trim()
 }
@@ -36,25 +36,25 @@ $resignedRecords = New-Object 'System.Collections.Generic.List[object]'
 $resignedDates = [ordered]@{}
 $peopleByClass = [ordered]@{}
 foreach ($row in $csvRows) {
-  $firstName = Normalize-Text $row.FirstName
+  $firstName = ConvertTo-NormalizedText $row.FirstName
   $first = ($firstName -split ' ')[0]
-  $last = Normalize-Text $row.LastName
+  $last = ConvertTo-NormalizedText $row.LastName
   if (-not $first -and -not $last) { continue }
   if (-not $first -or -not $last) {
     throw 'A CSV roster row has an incomplete name; no files were changed.'
   }
 
-  $classCode = Normalize-Text $row.Class
+  $classCode = ConvertTo-NormalizedText $row.Class
   if ($classCode -notmatch '^(?<year>\d{4})\s*(?<letter>[A-Z])$') {
     throw "Could not find a class code for '$first $last'; no files were changed."
   }
   $className = $Matches['year'] + ' ' + $Matches['letter']
 
-  $status = Normalize-Text $row.'No.'
+  $status = ConvertTo-NormalizedText $row.'No.'
   if ($status -notin @('0', '1')) {
     throw "Unexpected status '$status' for '$first $last'; expected 0 or 1. No files were changed."
   }
-  $payroll = Normalize-Text $row.'PR#'
+  $payroll = ConvertTo-NormalizedText $row.'PR#'
   if (-not $payroll) {
     throw "Missing payroll ID for '$first $last'; no files were changed."
   }
